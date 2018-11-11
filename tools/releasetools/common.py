@@ -3471,7 +3471,10 @@ class BlockDifference(object):
     if not self.src:
       # write the output unconditionally
       script.Print(" ")
-      script.Print("Flashing DerpFest System files...")
+      script.Print("Flashing DerpFest %s files..." % (self.partition,))
+    else:
+      script.Print(" ")
+      script.Print("Flashing DerpFest %s files after verification." % (self.partition,))
 
     if progress:
       script.ShowProgress(progress, 0)
@@ -3571,6 +3574,8 @@ class BlockDifference(object):
 
   def WritePostInstallVerifyScript(self, script):
     partition = self.partition
+    script.Print(" ")
+    script.Print('Verifying DerpFest %s files...' % (partition,))
     # Unlike pre-install verification, clobbered_blocks should not be ignored.
     ranges = self.tgt.care_map
     ranges_str = ranges.to_string_raw()
@@ -3588,7 +3593,11 @@ class BlockDifference(object):
               self.device, ranges_str,
               self._HashZeroBlocks(self.tgt.extended.size())))
       script.Print(" ")
-      script.Print("Verified DerpFest System files...")
+      script.Print('Verified DerpFest %s files.' % (partition,))
+      if partition == "system":
+        code = ErrorCode.SYSTEM_NONZERO_CONTENTS
+      else:
+        code = ErrorCode.VENDOR_NONZERO_CONTENTS
       script.AppendExtra(
           'else\n'
           '  abort("E%d: %s partition has unexpected non-zero contents after '
@@ -3596,7 +3605,7 @@ class BlockDifference(object):
           'endif;' % (code, partition))
     else:
       script.Print(" ")
-      script.Print("Verified DerpFest System files...")
+      script.Print('Verified DerpFest %s files.' % (partition,))
 
     if partition == "system":
       code = ErrorCode.SYSTEM_UNEXPECTED_CONTENTS
