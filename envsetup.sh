@@ -506,8 +506,14 @@ function lunch()
     export DERP_BUILD
     DERP_DEVICE=$DERP_BUILD
     export DERP_DEVICE
+
+    local depsOnly=""
+    if [[ $(find ./device -type d -name "$DERP_DEVICE" -print -quit) != "" ]]; then
+        depsOnly="true"
+    fi
+
     cd $T > /dev/null
-    vendor/derp/build/tools/roomservice.py $product
+    vendor/derp/build/tools/roomservice.py $product $depsOnly
     cd - > /dev/null
 
     _lunch_meat $product $release $variant
